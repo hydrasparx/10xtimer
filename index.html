@@ -1,0 +1,75 @@
+<html>
+<head>
+<style>
+#counter #main { font-size: 30px; }
+#counter #ms { font-size: 15px; }
+</style>
+</head>
+<body>
+<script>
+var freq1 = 440;
+var freq2 = 660;
+var duration = 0.15
+var audioCtx;
+var timer;
+
+function d2(val) {
+	return ('0' + parseInt(val)).slice(-2);
+}
+
+function play() {
+	audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+	let counter = 0;
+	timer = setInterval(() => {
+		counter += 0.1; 
+		let m = d2(counter / 60);
+		let s = d2(counter % 60);
+		let ms = parseInt((counter % 1) * 10);
+		document.getElementById('main').innerText = `${m}:${s}`;
+		document.getElementById('ms').innerText = `.${ms}`;
+	},100);
+
+	let offset = audioCtx.currentTime;
+	for (let i = 0; i < 10; i++) {
+		let beat = (i % 5);
+		start = offset + i;
+		
+		let oscillator = audioCtx.createOscillator();
+		let envelope = audioCtx.createGain();
+
+		oscillator.frequency.value = freq1; 
+		if (beat >= 3) {
+			oscillator.frequency.value = freq2;
+		}
+		
+		envelope.gain.value = 0.5;
+		envelope.gain.exponentialRampToValueAtTime(1, start + 0.001);
+		envelope.gain.exponentialRampToValueAtTime(0.3, start + (duration * 0.8));
+		
+		//oscillator.connect(audioCtx.destination);
+		oscillator.connect(envelope);
+		envelope.connect(audioCtx.destination);
+		oscillator.start(start); 
+		oscillator.stop(start + duration);
+
+/*
+		oscillator.onended = function() {
+		console.log('ended');
+		}
+*/
+	}
+}
+
+function stop() {
+	audioCtx.close();
+	clearInterval(timer);
+}
+
+
+
+</script>
+<div id="counter"><span id="main">00:00</span><span id="ms">.0</span></div>
+<button onclick="play()">Play</button>
+<button onclick="stop()">Stop</button>
+</body>
+</html>
