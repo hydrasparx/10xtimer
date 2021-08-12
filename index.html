@@ -1,6 +1,8 @@
 <html>
 <head>
 <style>
+#container { height: 100%; }
+#counter { max-width: 640px; border: 1px solid black; margin: auto auto }
 #counter #main { font-size: 30px; }
 #counter #ms { font-size: 15px; }
 </style>
@@ -21,7 +23,8 @@ function play() {
 	audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 	let counter = 0;
 	timer = setInterval(() => {
-		counter += 0.1; 
+		//counter += 0.1; 
+		counter = audioCtx.currentTime;
 		let m = d2(counter / 60);
 		let s = d2(counter % 60);
 		let ms = parseInt((counter % 1) * 10);
@@ -29,8 +32,8 @@ function play() {
 		document.getElementById('ms').innerText = `.${ms}`;
 	},100);
 
-	let offset = audioCtx.currentTime;
-	for (let i = 0; i < 10; i++) {
+	let offset = audioCtx.currentTime + 1;
+	for (let i = 0; i < 60; i++) { 
 		let beat = (i % 5);
 		start = offset + i;
 		
@@ -60,16 +63,50 @@ function play() {
 	}
 }
 
+function pause() {
+	audioCtx.suspend();
+}
+
+function resume() {
+	audioCtx.resume();
+}
+
+function toggle() {
+	let btnToggle = document.getElementById('btnToggle');
+	let state = btnToggle.innerText;
+	console.log(state);
+	if (state == 'Play') {
+		btnToggle.innerText = 'Pause';
+		play();
+	} else if (state == 'Pause') {
+		btnToggle.innerText = 'Resume';
+		pause();
+	} else if (state == 'Resume') {
+		btnToggle.innerText = 'Pause';
+		resume();
+	}
+	
+}
+
 function stop() {
 	audioCtx.close();
 	clearInterval(timer);
 }
 
+function reset() {
+	stop();
+	document.getElementById('btnToggle').innerText = 'Play';
+	document.getElementById('main').innerText = '00:00';
+	document.getElementById('ms').innerText = '.0';
+}
+
 
 
 </script>
-<div id="counter"><span id="main">00:00</span><span id="ms">.0</span></div>
-<button onclick="play()">Play</button>
-<button onclick="stop()">Stop</button>
+<div id="container">
+	<div id="counter"><span id="main">00:00</span><span id="ms">.0</span></div>
+	<button id="btnToggle" onclick="toggle()">Play</button>
+	<button onclick="reset()">Reset</button>
+</div>
 </body>
 </html>
