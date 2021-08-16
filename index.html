@@ -1,10 +1,15 @@
 <html>
 <head>
+<!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"-->
+<script src="https://kit.fontawesome.com/af957056e2.js" crossorigin="anonymous"></script>
+
 <style>
-#container { height: 100%; }
-#counter { max-width: 640px; border: 1px solid black; margin: auto auto }
-#counter #main { font-size: 30px; }
-#counter #ms { font-size: 15px; }
+body { max-width: 640px; text-align: center; background-color: #000; color: #fff; }
+#container { min-height: 300px; padding: 3rem; }
+#counter { max-width: 640px; border: 0px solid black; margin: auto auto; padding: 3rem; font-size: 10rem; }
+#counter #tms { font-size: 30px; }
+.toggle { font-size: 10rem; }
+
 </style>
 </head>
 <body>
@@ -14,6 +19,7 @@ var freq2 = 660;
 var duration = 0.15
 var audioCtx;
 var timer;
+var btnState = 'Play';
 
 function d2(val) {
 	return ('0' + parseInt(val)).slice(-2);
@@ -28,9 +34,10 @@ function play() {
 		let m = d2(counter / 60);
 		let s = d2(counter % 60);
 		let ms = parseInt((counter % 1) * 10);
-		document.getElementById('main').innerText = `${m}:${s}`;
-		document.getElementById('ms').innerText = `.${ms}`;
-	},100);
+		document.getElementById('tm').innerText = `${m}`;
+		document.getElementById('ts').innerText = `${s}`;
+		document.getElementById('tms').innerText = `${ms}`;
+	},10);
 
 	let offset = audioCtx.currentTime + 1;
 	for (let i = 0; i < 60; i++) { 
@@ -73,16 +80,22 @@ function resume() {
 
 function toggle() {
 	let btnToggle = document.getElementById('btnToggle');
-	let state = btnToggle.innerText;
+	let btnToggle2 = document.getElementById('btnToggle2');
+	//let state = btnToggle.innerText;
+	let state = btnState;
+	
 	console.log(state);
 	if (state == 'Play') {
-		btnToggle.innerText = 'Pause';
+		btnState = 'Pause';
+		btnToggle2.className = 'far fa-pause-circle';
 		play();
 	} else if (state == 'Pause') {
-		btnToggle.innerText = 'Resume';
+		btnState = 'Resume';
+		btnToggle2.className = 'far fa-play-circle';
 		pause();
 	} else if (state == 'Resume') {
-		btnToggle.innerText = 'Pause';
+		btnState = 'Pause';
+		btnToggle2.className = 'far fa-pause-circle';
 		resume();
 	}
 	
@@ -96,17 +109,21 @@ function stop() {
 function reset() {
 	stop();
 	document.getElementById('btnToggle').innerText = 'Play';
-	document.getElementById('main').innerText = '00:00';
-	document.getElementById('ms').innerText = '.0';
+	document.getElementById('tm').innerText = '00';
+	document.getElementById('ts').innerText = '00';
+	document.getElementById('tms').innerText = '0';
 }
 
 
 
 </script>
 <div id="container">
-	<div id="counter"><span id="main">00:00</span><span id="ms">.0</span></div>
+	<div id="counter"><span id="tm">00</span>:<span id="ts">00</span>.<span id="tms">0</span></div>
+<!--
 	<button id="btnToggle" onclick="toggle()">Play</button>
 	<button onclick="reset()">Reset</button>
+-->
+	<div class="toggle"><i id="btnToggle2" class="far fa-play-circle" onclick="toggle()"></i></div>
 </div>
 </body>
 </html>
