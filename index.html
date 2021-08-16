@@ -21,6 +21,8 @@ var duration = 0.15
 var audioCtx;
 var timer;
 var btnState = 'Play';
+var last;
+var offset;
 
 function d2(val) {
 	return ('0' + parseInt(val)).slice(-2);
@@ -29,6 +31,7 @@ function d2(val) {
 function play() {
 	audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 	let counter = 0;
+	last = 0;
 	timer = setInterval(() => {
 		//counter += 0.1; 
 		counter = audioCtx.currentTime;
@@ -40,10 +43,15 @@ function play() {
 		document.getElementById('tms').innerText = `${ms}`;
 	},10);
 
-	let offset = audioCtx.currentTime + 1;
-	for (let i = 0; i < 60; i++) { 
-		let beat = (i % 5);
-		start = offset + i;
+	offset = audioCtx.currentTime + 1;
+	addTick(offset, 60);
+}
+
+function addTick(offsets, count) {
+	for (let i = 0; i < count; i++) { 
+		//let offset = audioCtx.currentTime + last;
+		let beat = ((offset - 1 + last) % 5);
+		start = offset + last;
 		
 		let oscillator = audioCtx.createOscillator();
 		let envelope = audioCtx.createGain();
@@ -63,11 +71,14 @@ function play() {
 		oscillator.start(start); 
 		oscillator.stop(start + duration);
 
-/*
+		last++;
+
 		oscillator.onended = function() {
-		console.log('ended');
+			//console.log('ended');
+			addTick(offset + last, 1);
+			console.log(last + " / " + offset);
 		}
-*/
+
 	}
 }
 
